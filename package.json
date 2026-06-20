@@ -1,0 +1,24 @@
+{
+  "name": "task_3",
+  "version": "1.0.0",
+  "description": "",
+  "main": "task3.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aiakoniya/task3.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Aiakoniya/task3/issues"
+  },
+  "homepage": "https://github.com/Aiakoniya/task3#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
