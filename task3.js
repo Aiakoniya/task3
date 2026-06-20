@@ -1,46 +1,48 @@
 const express = require('express')
 const app = express()
 
-// Функция для поиска НОД (Наибольший Общий Делитель)
+// Функция для поиска НОД с использованием BigInt (защита от переполнения и падения сервера)
 function gcd(a, b) {
-	return b === 0 ? a : gcd(b, a % b)
+	return b === 0n ? a : gcd(b, a % b)
 }
 
-// Функция для поиска НОК (Наименьшее Общее Кратное)
+// Функция для поиска НОК с использованием BigInt
 function lcm(a, b) {
+	if (a === 0n || b === 0n) return 0n
 	return (a * b) / gcd(a, b)
 }
 
-// Проверка, является ли строка натуральным числом (строго целое > 0)
+// Проверка, является ли строка натуральным числом
 function isNatural(str) {
-	if (!str || !/^\d+$/.test(str)) return false
-	const num = Number(str)
-	return num > 0
+	if (!str || typeof str !== 'string') return false
+	// Проверяем, что в строке только цифры и число больше нуля
+	return /^\d+$/.test(str) && BigInt(str) > 0n
 }
 
-// Эндпоинт, сформированный из вашего email: aigerima.nurlanova@gmail.com
 app.get('/aigerima_nurlanova_gmail_com', (req, res) => {
 	const { x, y } = req.query
 
-	// Устанавливаем заголовок чистого текста, как требует задание
-	res.setHeader('Content-Type', 'text/plain')
-
-	// Если x или y не переданы или не являются натуральными числами
+	// Используем writeHead, чтобы отдать СТРОГО text/plain без автоматических добавок вроде charset=utf-8
 	if (!isNatural(x) || !isNatural(y)) {
-		return res.send('NaN')
+		res.writeHead(200, { 'Content-Type': 'text/plain' })
+		return res.end('NaN')
 	}
 
-	const numX = parseInt(x, 10)
-	const numY = parseInt(y, 10)
+	try {
+		const numX = BigInt(x)
+		const numY = BigInt(y)
+		const result = lcm(numX, numY)
 
-	const result = lcm(numX, numY)
-
-	// Отправляем строго строку с цифрами
-	res.send(result.toString())
+		res.writeHead(200, { 'Content-Type': 'text/plain' })
+		res.end(result.toString())
+	} catch (error) {
+		// Защита: если произойдет любая непредвиденная ошибка, сервер не упадет, а вернет NaN
+		res.writeHead(200, { 'Content-Type': 'text/plain' })
+		res.end('NaN')
+	}
 })
 
-// Настройка порта (динамический для хостингов вроде Render/Railway или 3000 локально)
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
-	console.log(`Сервер успешно запущен на порту ${PORT}`)
+	console.log(`Сервер запущен на порту ${PORT}`)
 })
